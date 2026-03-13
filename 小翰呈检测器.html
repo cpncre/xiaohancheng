@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小翰呈检测器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .start-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .test-card {
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .start-card h2 {
+            font-size: 1.4rem;
+        }
+
+        .start-card p {
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 36px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .question-counter {
+            text-align: center;
+            color: #888;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            line-height: 1.7;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 12px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+
+        .option.selected {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+        }
+
+        .result-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .result-icon {
+            font-size: 3rem;
+        }
+
+        .result-title {
+            font-size: 1.6rem;
+        }
+
+        .result-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .result-desc {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .result-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .result-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .result-bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px 0 0 0;
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .level-indicator {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .level-item {
+            text-align: center;
+            padding: 8px;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        .level-mihei { background: rgba(100, 100, 255, 0.2); }
+        .level-luren { background: rgba(100, 200, 100, 0.2); }
+        .level-xiaozi { background: rgba(255, 150, 50, 0.2); }
+
+        .level-item .score-range {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .level-item .level-name {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">小翰呈检测器</div>
+            <div class="subtitle">通过 25 道专业问题，客观科学准确地检测你是不是小翰呈</div>
+        </header>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">25</div>
+                <div class="stat-label">道专业题目！</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3</div>
+                <div class="stat-label">种结果类型</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">≤114514</div>
+                <div class="stat-label">分钟完成</div>
+            </div>
+        </div>
+
+        <div id="start-page" class="card start-card fade-in">
+            <h2>你是小翰呈吗？</h2>
+            <p>通过 25 道专业问题，客观科学准确地检测你是不是小翰呈<br>看看你与小翰呈的相似度</p>
+            
+            <div class="level-indicator">
+                <div class="level-item level-mihei">
+                    <div class="score-range">0-40分</div>
+                    <div class="level-name">你不是小翰呈！</div>
+                </div>
+                <div class="level-item level-luren">
+                    <div class="score-range">41-75分</div>
+                    <div class="level-name">你是小翰呈吗？！？！？不是吧！</div>
+                </div>
+                <div class="level-item level-xiaozi">
+                    <div class="score-range">76-100分</div>
+                    <div class="level-name">你一定是小翰呈无疑了</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startTest()">立即开始~</button>
+        </div>
+
+        <div id="test-page" class="card test-card hidden">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="question-counter" id="question-counter">第 1 题 / 共 20 题</div>
+            <div class="question-text" id="question-text"></div>
+            <div class="options" id="options"></div>
+        </div>
+
+        <div id="result-page" class="card result-card hidden">
+            <div class="result-icon" id="result-icon"></div>
+            <div class="result-title" id="result-title"></div>
+            <div class="result-score" id="result-score"></div>
+            <div class="result-bar">
+                <div class="result-bar-fill" id="result-bar-fill"></div>
+            </div>
+            <div class="result-bar-labels">
+                <span>你不是小翰呈！</span>
+                <span>你是小翰呈吗？！？！？不是吧！</span>
+                <span>你一定是小翰呈无疑了</span>
+            </div>
+            <div class="result-desc" id="result-desc"></div>
+            <button class="btn btn-primary" onclick="restartTest()">重新~~测试</button>
+        </div>
+
+        <footer>
+            <p>本测试为CPN编写的权威测试，请勿质疑真实性，否则达司</p>
+        </footer>
+    </div>
+
+    <script>
+        const questions = [
+            "你是女性对吧",
+            "你肥肠喜欢给别人发涩涩表情包",
+            "你一天不涩涩就浑身难受对吧？我说得没戳吧！",
+            "经常污蔑伟大的CPN为萝莉控！他喜欢纳西妲怎么了！！！！",
+            "经常在半夜偷偷内卷，甚至通宵，这种人是需要达司的！！！",
+            "在现实世界非常正经，但在某QQ群里又是另一幅场面",
+            "千米3秒3",
+            "承认污蔑伟大的CPN为萝莉控",
+            "天天抱着刻律睡觉，已经变成没有刻律就不行的样子了呢",
+            "翰呈有流萤的杯子！！！",
+            "翰呈不仅有流萤的杯子，还准备买刻律的杯子！！",
+            "翰呈天天不听课，天天在想着她的刻律",
+            "小翰呈天天给他人发涩涩表情包，导致被QQ警告，但小翰呈不怕",
+            "小翰呈就是一个香香软软QQ弹弹好吃到布灵布灵DuangDuang的蓝莓小蛋糕~",
+            "小翰呈身娇体弱，轻轻一推就倒",
+            "小翰呈一到晚上就会吃下高浓度春药，不然是睡不着的",
+            "小翰呈不仅晚上会吃高浓度春药，就连来学校都会随身带着春药，还送同学妄图对同学图谋不轨",
+            "小翰呈这种人就应该达司！！！",
+            "明明有钱，但是总试图说服伟大的CPN v她50",
+            "一到星期就崩铁启动，三角洲启动",
+            "经常拒绝为伟大的CPN采购4根32G ddr4内存条",
+            "经常拒绝为伟大的CPN购置RTX5060",
+            "同意小翰呈cos刻律",
+			"同意小翰呈天天穿粉色小裙子来学校",
+            "你是小翰呈"
+        ];
+
+        const options = [
+            { text: "非常同意", score: 4 },
+            { text: "同意", score: 3 },
+            { text: "中立/不确定", score: 2 },
+            { text: "不同意", score: 1 },
+            { text: "非常不同意", score: 0 }
+        ];
+
+        let currentQuestion = 0;
+        let totalScore = 0;
+        let isProcessing = false;
+
+        function startTest() {
+            currentQuestion = 0;
+            totalScore = 0;
+            isProcessing = false;
+            document.getElementById('start-page').classList.add('hidden');
+            document.getElementById('test-page').classList.remove('hidden');
+            document.getElementById('test-page').classList.add('fade-in');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('question-counter').textContent = `第 ${currentQuestion + 1} 题 / 共 ${questions.length} 题`;
+            document.getElementById('question-text').textContent = questions[currentQuestion];
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'option';
+                optionEl.textContent = option.text;
+                optionEl.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionEl);
+            });
+        }
+
+        function selectOption(index) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const optionEls = document.querySelectorAll('.option');
+            optionEls.forEach(el => el.classList.remove('selected'));
+            optionEls[index].classList.add('selected');
+
+            setTimeout(() => {
+                totalScore += options[index].score;
+                currentQuestion++;
+
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                    isProcessing = false;
+                } else {
+                    showResult();
+                }
+            }, 300);
+        }
+
+        function showResult() {
+            document.getElementById('test-page').classList.add('hidden');
+            document.getElementById('result-page').classList.remove('hidden');
+            document.getElementById('result-page').classList.add('fade-in');
+
+            let level, icon, desc, color;
+
+            if (totalScore <= 40) {
+                level = "完全不是小翰呈";
+                icon = "💙";
+                color = "#6464ff";
+                desc = "你不是小翰呈！小翰呈不是这样的！！！请滚开！";
+            } else if (totalScore <= 75) {
+                level = "好像是小翰呈，但不是";
+                icon = "💚";
+                color = "#64c864";
+                desc = "你不是小翰呈！但是对小翰呈有了解，但是请不要冒充香香软软的小翰呈哦！";
+            } else {
+                level = "小翰呈无疑了";
+                icon = "🧡";
+                color = "#ff9632";
+                desc = "没错！！！你就是香香软软QQ弹弹好吃到布灵布灵DuangDuang的小翰呈哦！";
+            }
+
+            document.getElementById('result-icon').textContent = icon;
+            document.getElementById('result-title').textContent = `鉴定结果：${level}`;
+            document.getElementById('result-score').textContent = `${totalScore} 分`;
+            document.getElementById('result-desc').textContent = desc;
+
+            const barFill = document.getElementById('result-bar-fill');
+            const percentage = (totalScore / 100) * 100;
+            barFill.style.width = percentage + '%';
+            barFill.style.background = color;
+        }
+
+        function restartTest() {
+            document.getElementById('result-page').classList.add('hidden');
+            document.getElementById('start-page').classList.remove('hidden');
+            document.getElementById('start-page').classList.add('fade-in');
+        }
+    </script>
+</body>
+</html>

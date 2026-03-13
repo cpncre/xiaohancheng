@@ -1,2 +1,2 @@
-# xiaohancheng
-The xiaohancheng
+# 小翰呈检测器
+通过 25 道专业问题，客观科学准确地检测你是不是小翰呈
